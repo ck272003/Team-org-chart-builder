@@ -1,0 +1,10 @@
+# Real rosters and exports can contain personal data - never commit them
+*.xlsx
+!Team_Roster_Sample.xlsx
+org_data.json
+!org_data_sample.json
+*.csv
+~$*.xlsx
+__pycache__/
+.venv/
+.DS_Store
