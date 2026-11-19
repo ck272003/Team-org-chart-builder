@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+"""
+Convert the roster workbook into org_data.json for index.html ("Import data").
+
+Reads four sheets (header in row 1):
+    Departments  : Department | Lead
+    Teams        : Department | Team
+    Members      : Name | Status (Active / Inactive)
+    Assignments  : Member | Team
+
+Usage:
+    python build_data.py                              # Team_Roster_Sample.xlsx -> org_data.json
+    python build_data.py my_roster.xlsx -o my.json --title "Acme Org Chart" --top "CEO"
+"""
+import argparse
+import json
+import sys
+
+from openpyxl import load_workbook
+
+
+def rows(ws):
+    """Yield non-empty rows (as stripped strings) below the header row."""
+    for r in ws.iter_rows(min_row=2, values_only=True):
+        vals = [("" if v is None else str(v).strip()) for v in r]
+        if any(vals):
+            yield vals
+
+
+def main():
+    p = argparse.ArgumentParser(description="Excel roster -> JSON for the org chart.")
+    p.add_argument("workbook", nargs="?", default="Team_Roster_Sample.xlsx")
+    p.add_argument("-o", "--output", default="org_data.json")
+    p.add_argument("--title", default="Team Hierarchy")
+    p.add_argument("--top", default="Director", help="Label for the top box")
+    a = p.parse_args()
+
+    wb = load_workbook(a.workbook, data_only=True)
+    for need in ("Departments", "Teams", "Members", "Assignments"):
+        if need not in wb.sheetnames:
+            sys.exit(f"Missing sheet '{need}' in {a.workbook}")
+
+    depts, teams, warnings = {}, {}, []
+    for name, lead, *_ in rows(wb["Departments"]):
+        if name:
+            depts[name] = {"name": name, "lead": lead, "teams": []}
+    for dept, team, *_ in rows(wb["Teams"]):
+        if not team:
+            continue
+        if dept not in depts:
+            warnings.append(f"Team '{team}' has unknown department '{dept}' - skipped")
+            continue
+        teams[team] = {"name": team, "members": []}
+        depts[dept]["teams"].append(teams[team])
+
+    members = []
+    for name, status, *_ in rows(wb["Members"]):
+        if name:
+            members.append({"name": name, "active": status.lower() != "inactive"})
+    known = {m["name"] for m in members}
+
+    for member, team, *_ in rows(wb["Assignments"]):
+        if not member or not team:
+            continue
+        if team not in teams:
+            warnings.append(f"Assignment '{member}' -> unknown team '{team}' - skipped")
+        elif member not in known:
+            warnings.append(f"Assignment for '{member}' who is not on the Members sheet - skipped")
+        elif member not in teams[team]["members"]:
+            teams[team]["members"].append(member)
+
+    data = {"title": a.title, "top": a.top, "members": members,
+            "departments": list(depts.values())}
+    with open(a.output, "w", encoding="utf-8") as fh:
+        json.dump(data, fh, indent=2, ensure_ascii=False)
+
+    n_assign = sum(len(t["members"]) for t in teams.values())
+    print(f"Wrote {a.output}: {len(depts)} departments, {len(teams)} teams, "
+          f"{len(members)} members, {n_assign} assignments")
+    for w in warnings:
+        print("WARNING:", w)
+
+
+if __name__ == "__main__":
+    main()
