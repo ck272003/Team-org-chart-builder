@@ -1,0 +1,164 @@
+{
+  "title": "Sample Company Team Hierarchy",
+  "top": "Director",
+  "members": [
+    {
+      "name": "Alex Carter",
+      "active": true
+    },
+    {
+      "name": "Bailey Ross",
+      "active": true
+    },
+    {
+      "name": "Charlie Singh",
+      "active": true
+    },
+    {
+      "name": "Dana Whitfield",
+      "active": true
+    },
+    {
+      "name": "Eli Nakamura",
+      "active": true
+    },
+    {
+      "name": "Fiona Brandt",
+      "active": true
+    },
+    {
+      "name": "Gabe Okafor",
+      "active": true
+    },
+    {
+      "name": "Hana Petrov",
+      "active": true
+    },
+    {
+      "name": "Ivan Costa",
+      "active": true
+    },
+    {
+      "name": "Jules Moreau",
+      "active": false
+    },
+    {
+      "name": "Kai Anders",
+      "active": true
+    },
+    {
+      "name": "Lena Fischer",
+      "active": true
+    },
+    {
+      "name": "Milo Grant",
+      "active": false
+    },
+    {
+      "name": "Nora Elvin",
+      "active": true
+    },
+    {
+      "name": "Omar Haddad",
+      "active": true
+    },
+    {
+      "name": "Quinn Avery",
+      "active": true
+    }
+  ],
+  "departments": [
+    {
+      "name": "Engineering",
+      "lead": "Jordan Lee",
+      "teams": [
+        {
+          "name": "Platform Team",
+          "members": [
+            "Alex Carter",
+            "Bailey Ross",
+            "Charlie Singh",
+            "Jules Moreau"
+          ]
+        },
+        {
+          "name": "Mobile Team",
+          "members": [
+            "Charlie Singh",
+            "Dana Whitfield",
+            "Eli Nakamura"
+          ]
+        },
+        {
+          "name": "Data Team",
+          "members": [
+            "Alex Carter",
+            "Fiona Brandt",
+            "Gabe Okafor"
+          ]
+        },
+        {
+          "name": "DevOps",
+          "members": [
+            "Bailey Ross"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Design",
+      "lead": "Casey Morgan",
+      "teams": [
+        {
+          "name": "Product Design",
+          "members": [
+            "Hana Petrov",
+            "Ivan Costa"
+          ]
+        },
+        {
+          "name": "Brand & Content",
+          "members": []
+        }
+      ]
+    },
+    {
+      "name": "Operations",
+      "lead": "Riley Chen",
+      "teams": [
+        {
+          "name": "People Ops",
+          "members": [
+            "Kai Anders",
+            "Lena Fischer",
+            "Milo Grant"
+          ]
+        },
+        {
+          "name": "Talent Acquisition",
+          "members": [
+            "Lena Fischer"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Business Development",
+      "lead": "Taylor Brooks",
+      "teams": [
+        {
+          "name": "Sales Team",
+          "members": [
+            "Nora Elvin",
+            "Omar Haddad",
+            "Quinn Avery"
+          ]
+        },
+        {
+          "name": "Partnerships",
+          "members": []
+        }
+      ]
+    }
+  ]
+}
