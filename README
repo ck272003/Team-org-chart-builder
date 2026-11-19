@@ -1,0 +1,87 @@
+# Team Org Chart Builder
+
+A single-file web app that draws an interactive organization chart: a top
+position, departments, teams, and members assigned to those teams. Optionally
+keep your roster in Excel and convert it with a small Python script.
+
+> All names, teams and departments in this repository are **fictional sample data**.
+
+## Features
+
+- **Interactive chart**: click to rename the top box, departments and teams; add or delete departments, teams and members
+- **Multi-team members**: one person can sit on several teams; their other teams show beside their name
+- **Inactive members** shown in red, with a one-click toggle to hide them
+- **Live search** that highlights matching teams and people
+- **Auto-save** in the browser, **Import / Export** as JSON, **Print / Save as PDF**
+- **Light and dark mode**, responsive layout, no dependencies, no server
+
+## Quick start
+
+Open `index.html` in any modern browser. That's it.
+
+## Use your own data from Excel (optional)
+
+1. Edit `Team_Roster_Sample.xlsx` (or a copy). It has four data sheets:
+
+   | Sheet | Columns |
+   |---|---|
+   | Departments | Department, Lead |
+   | Teams | Department, Team |
+   | Members | Name, Status (Active / Inactive) |
+   | Assignments | Member, Team (one row per membership) |
+
+2. Convert it:
+
+   ```bash
+   pip install -r requirements.txt
+   python build_data.py my_roster.xlsx -o org_data.json --title "My Org Chart" --top "CEO"
+   ```
+
+3. In `index.html`, click **Import data** and choose `org_data.json`.
+
+`build_data.py` options: `workbook` (positional), `-o/--output`, `--title`, `--top`.
+It prints a warning for any assignment that points to an unknown team or member.
+
+## JSON format
+
+```json
+{
+  "title": "Sample Company Team Hierarchy",
+  "top": "Director",
+  "members": [{ "name": "Alex Carter", "active": true }],
+  "departments": [
+    { "name": "Engineering", "lead": "Jordan Lee",
+      "teams": [{ "name": "Platform Team", "members": ["Alex Carter"] }] }
+  ]
+}
+```
+
+## Project files
+
+| File | Purpose |
+|---|---|
+| `index.html` | The whole app (HTML + CSS + JavaScript) |
+| `build_data.py` | Excel roster to JSON converter |
+| `Team_Roster_Sample.xlsx` | Example roster with dropdowns and count formulas |
+| `org_data_sample.json` | Example output of the converter |
+| `How_to_Use.pdf` | Short illustrated user guide |
+| `requirements.txt` | Python dependency (`openpyxl`) |
+| `.gitignore` | Keeps real rosters out of version control |
+
+## Privacy
+
+The app runs entirely in your browser and stores data only in that browser's
+local storage. Nothing is uploaded. If you use real people's data, keep it out
+of public repositories - the included `.gitignore` blocks every `.xlsx` and
+`org_data.json` except the sample files.
+
+## Tech
+
+HTML, CSS, vanilla JavaScript; Python 3 with [openpyxl](https://openpyxl.readthedocs.io/).
+
+## Ideas for extension
+
+- Drag-and-drop to move members between teams
+- CSV import and export
+- Role / title field per member
+- Hosting on GitHub Pages as a live demo
