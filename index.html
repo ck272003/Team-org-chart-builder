@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Team Org Chart Builder</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f3f6fb;--card:#fff;--ink:#1d2a3a;--mute:#6a7889;--line:#cbd5df;--chip:#e6f1fc;--chipi:#1f5f98;--btn:#e9eff6;--blue:#2189df;--green:#42aa91;--redbg:#fde4e4;--redi:#b3261e;--sh:0 2px 8px rgba(20,40,70,.08)}
+@media (prefers-color-scheme:dark){:root{--bg:#11161d;--card:#1a212b;--ink:#e7ecf2;--mute:#97a3b3;--line:#39444f;--chip:#223850;--chipi:#a8cdf4;--btn:#28313d;--redbg:#4b2326;--redi:#ffb4ab;--sh:none}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 Inter,"Segoe UI",system-ui,Arial,sans-serif}
+header{background:var(--card);border-bottom:1px solid var(--line);padding:14px 24px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+h1{font-size:21px;margin:0}.sub{color:var(--mute);font-size:13px}
+button{font:inherit;font-weight:600;font-size:13px;border:0;border-radius:8px;padding:8px 13px;background:var(--btn);color:var(--ink);cursor:pointer}
+button:hover{filter:brightness(.94)}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.pri{background:var(--blue);color:#fff}.on{box-shadow:inset 0 0 0 1.5px var(--blue);color:var(--blue)}.dng{color:var(--redi)}
+.bar{margin:14px 24px 0;background:var(--card);border-radius:10px;padding:10px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;box-shadow:var(--sh)}
+.bar .sp{flex:1}.stat{font-size:13px;color:var(--mute)}.stat b{color:var(--ink)}.stat .r{color:var(--redi)}
+input[type=search],.fld input{padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;width:220px;max-width:100%}
+.scroll{overflow-x:auto;padding:18px 24px 60px}
+.top{text-align:center}.top b{display:inline-block;background:var(--blue);color:#fff;padding:11px 54px;border-radius:8px;cursor:pointer}
+.top i{display:block;width:1px;height:24px;background:var(--line);margin:0 auto}
+.depts{display:flex;gap:26px;justify-content:center;min-width:max-content}
+.dept{width:270px;position:relative;padding-top:24px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.dept::before{content:"";position:absolute;top:0;left:-13px;right:-13px;border-top:1px solid var(--line)}
+.dept:first-child::before{left:50%}.dept:last-child::before{right:50%}.dept:only-child::before{display:none}
+.dept::after{content:"";position:absolute;top:0;left:50%;height:24px;border-left:1px solid var(--line)}
+.dh{background:var(--green);color:#fff;border-radius:8px;padding:10px 16px;text-align:center;min-width:170px;cursor:pointer}
+.dh b{display:block}.dh small{font-weight:600}
+.team{background:var(--card);border-radius:10px;padding:12px;width:100%;box-shadow:var(--sh);border:1px solid transparent}
+.team.hit{border-color:var(--blue)}
+.th{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.th b{font-size:14px}
+.cnt{background:var(--chip);color:var(--chipi);border-radius:10px;padding:1px 7px;font-size:11px;margin-left:6px}
+.mini{padding:3px 9px;font-size:12px}
+select{width:100%;padding:7px;margin:8px 0;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--chip);color:var(--chipi);border-radius:14px;padding:4px 6px 4px 10px;font-size:12px}
+.chip.left{background:var(--redbg);color:var(--redi)}.chip.m{background:var(--blue);color:#fff}
+.chip em{font-style:normal;font-weight:700}.chip button{background:none;padding:0 4px;color:inherit}
+.empty{color:var(--mute);font-size:12px}.add{background:transparent;border:1px dashed var(--line);color:var(--mute)}
+dialog{border:0;border-radius:12px;padding:20px;width:min(520px,94vw);background:var(--card);color:var(--ink);box-shadow:0 10px 40px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(10,20,35,.5)}dialog h2{margin:0 0 12px;font-size:18px}
+.fld{margin:10px 0}.fld label{display:block;font-size:12px;font-weight:700;color:var(--mute);margin-bottom:4px}.fld input{width:100%}
+.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.ros{max-height:300px;overflow:auto;margin-top:10px;border:1px solid var(--line);border-radius:8px}
+.ros div{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-bottom:1px solid var(--line);font-size:13px;gap:8px}
+.ros label{font-size:12px;color:var(--mute);white-space:nowrap}
+@media print{.bar,header div:last-child,select,.mini,.add,.chip button{display:none!important}.scroll{overflow:visible}body{background:#fff}}
+</style></head><body>
+<header><div><h1 id="ttl"></h1><div class="sub">Organization chart with members assigned to teams</div></div>
+<div><button id="a-ros">Manage members</button> <button id="a-imp">Import data</button> <button id="a-exp">Export data</button> <button id="a-print">Print / Save PDF</button> <button class="pri" id="a-dept">+ Add department</button></div></header>
+<div class="bar">
+<button id="t-int">Hide members</button><button id="t-left">Hide inactive</button><button id="a-reset">Reset to sample</button>
+<input type="search" id="q" placeholder="Search team or person…" aria-label="Search">
+<span class="sp"></span><span class="stat" id="stat"></span></div>
+<div class="scroll"><div class="top"><b id="top" title="Click to edit"></b><i></i></div><div class="depts" id="root"></div></div>
+<input type="file" id="file" accept=".json,application/json" hidden>
+<dialog id="dlg"><h2 id="dt"></h2><div id="db"></div></dialog>
+<script>
+/* ALL DATA BELOW IS FICTIONAL SAMPLE DATA */
+const SAMPLE={title:"Sample Company Team Hierarchy",top:"Director",
+members:[{name:"Alex Carter"},{name:"Bailey Ross"},{name:"Charlie Singh"},{name:"Dana Whitfield"},{name:"Eli Nakamura"},{name:"Fiona Brandt"},{name:"Gabe Okafor"},{name:"Hana Petrov"},{name:"Ivan Costa"},{name:"Jules Moreau",active:false},{name:"Kai Anders"},{name:"Lena Fischer"},{name:"Milo Grant",active:false},{name:"Nora Elvin"},{name:"Omar Haddad"},{name:"Quinn Avery"}],
+departments:[
+{name:"Engineering",lead:"Jordan Lee",teams:[{name:"Platform Team",members:["Alex Carter","Bailey Ross","Charlie Singh","Jules Moreau"]},{name:"Mobile Team",members:["Charlie Singh","Dana Whitfield","Eli Nakamura"]},{name:"Data Team",members:["Alex Carter","Fiona Brandt","Gabe Okafor"]},{name:"DevOps",members:["Bailey Ross"]}]},
+{name:"Design",lead:"Casey Morgan",teams:[{name:"Product Design",members:["Hana Petrov","Ivan Costa"]},{name:"Brand & Content",members:[]}]},
+{name:"Operations",lead:"Riley Chen",teams:[{name:"People Ops",members:["Kai Anders","Lena Fischer","Milo Grant"]},{name:"Talent Acquisition",members:["Lena Fischer"]}]},
+{name:"Business Development",lead:"Taylor Brooks",teams:[{name:"Sales Team",members:["Nora Elvin","Omar Haddad","Quinn Avery"]},{name:"Partnerships",members:[]}]}]};
+const KEY="org_chart_v1";
+function fromData(d){const dep=(d.departments||[]).map(x=>({n:x.name,l:x.lead||"",t:(x.teams||[]).map(t=>({n:t.name,m:[...(t.members||[])]}))}));
+ const names=new Set((d.members||[]).map(m=>m.name));dep.forEach(x=>x.t.forEach(t=>t.m.forEach(p=>names.add(p))));
+ return{title:d.title||"Team Hierarchy",ceo:d.top||"Top position",roster:[...names].sort(),left:(d.members||[]).filter(m=>m.active===false).map(m=>m.name),hideI:false,hideL:false,depts:dep}}
+const toData=s=>({title:s.title,top:s.ceo,members:s.roster.map(n=>({name:n,active:!s.left.includes(n)})),departments:s.depts.map(d=>({name:d.n,lead:d.l,teams:d.t.map(t=>({name:t.n,members:t.m}))}))});
+let st;try{st=JSON.parse(localStorage.getItem(KEY))}catch(e){}if(!st||!st.depts)st=fromData(SAMPLE);
+let q="";const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const short=n=>n.replace(/^Team /,"");
+const teamsOf=p=>st.depts.flatMap(d=>d.t).filter(t=>t.m.includes(p)).map(t=>short(t.n));
+function render(){
+ $("ttl").textContent=st.title;document.title=st.title;$("top").textContent=st.ceo;
+ const placed=[...new Set(st.depts.flatMap(d=>d.t.flatMap(t=>t.m)))],lc=placed.filter(p=>st.left.includes(p)).length;
+ $("stat").innerHTML=`<b>${placed.length}</b> placed · <b>${placed.length-lc}</b> active · <b class="r">${lc}</b> <span class="r">inactive</span>`;
+ $("t-int").textContent=st.hideI?"Show members":"Hide members";$("t-int").classList.toggle("on",st.hideI);
+ $("t-left").textContent=st.hideL?"Show inactive":"Hide inactive";$("t-left").classList.toggle("on",st.hideL);
+ $("root").innerHTML=st.depts.map((d,i)=>`<div class="dept"><div class="dh" data-a="ed" data-i="${i}" title="Click to edit"><b>${esc(d.n)}</b><small>Lead: ${esc(d.l||"—")}</small></div>
+ ${d.t.map((t,j)=>{const ms=t.m.filter(p=>!(st.hideL&&st.left.includes(p)));const hit=q&&(t.n.toLowerCase().includes(q)||ms.some(p=>p.toLowerCase().includes(q)));
+ return `<div class="team${hit?" hit":""}"><div class="th"><div><b>${esc(t.n)}</b>${ms.length?`<span class="cnt">${ms.length}</span>`:""}</div><div><button class="mini" data-a="et" data-i="${i}" data-j="${j}">Edit</button></div></div>
+ ${st.hideI?"":`<select data-a="add" data-i="${i}" data-j="${j}" aria-label="Add member"><option value="">+ Select member to add</option>${st.roster.filter(p=>!t.m.includes(p)).map(p=>`<option>${esc(p)}</option>`).join("")}</select>
+ <div class="chips">${ms.length?ms.map(p=>{const o=teamsOf(p),L=st.left.includes(p),M=q&&p.toLowerCase().includes(q);return `<span class="chip${L?" left":""}${M?" m":""}" ${L?'title="Inactive"':""}>${esc(p)}${o.length>1?` <em>(${esc(o.join(" + "))})</em>`:""}<button data-a="rm" data-i="${i}" data-j="${j}" data-p="${esc(p)}" aria-label="Remove ${esc(p)}">×</button></span>`}).join(""):'<span class="empty">No members yet</span>'}</div>`}</div>`}).join("")}
+ <button class="add" data-a="at" data-i="${i}">+ Add team</button></div>`).join("");
+ try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+function ask(title,fields,ok,del){const f=fields.map(([k,l,v])=>`<div class="fld"><label>${l}</label><input id="f-${k}" value="${esc(v||"")}"></div>`).join("");
+ $("dt").textContent=title;$("db").innerHTML=f+`<div class="acts">${del?'<button class="dng" id="f-del">Delete</button>':""}<button id="f-x">Cancel</button><button class="pri" id="f-ok">Save</button></div>`;
+ $("f-x").onclick=()=>$("dlg").close();$("f-ok").onclick=()=>{ok(k=>$("f-"+k).value.trim());$("dlg").close();render()};
+ if(del)$("f-del").onclick=()=>{if(confirm("Delete this?")){del();$("dlg").close();render()}};$("dlg").showModal()}
+function roster(){const L=st.left;$("dt").textContent="Manage members";
+ $("db").innerHTML=`<div class="fld"><label>Add a name</label><div style="display:flex;gap:8px"><input id="nn" placeholder="Full name"><button class="pri" id="nb">Add</button></div></div>
+ <div class="ros">${st.roster.map((p,k)=>`<div><span>${esc(p)}</span><span><label><input type="checkbox" data-l="${k}" ${L.includes(p)?"checked":""}> Inactive</label> <button class="mini dng" data-d="${k}" aria-label="Delete ${esc(p)}">×</button></span></div>`).join("")}</div>
+ <div class="acts"><button class="pri" id="rd">Done</button></div>`;
+ $("rd").onclick=()=>{$("dlg").close();render()};
+ $("nb").onclick=()=>{const n=$("nn").value.trim();if(n&&!st.roster.includes(n)){st.roster.push(n);st.roster.sort();roster()}};
+ $("db").querySelectorAll("[data-l]").forEach(c=>c.onchange=()=>{const p=st.roster[c.dataset.l];st.left=c.checked?[...new Set([...L,p])]:L.filter(x=>x!==p)});
+ $("db").querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{const p=st.roster[b.dataset.d];st.roster.splice(b.dataset.d,1);st.depts.forEach(d=>d.t.forEach(t=>t.m=t.m.filter(x=>x!==p)));roster()});
+ if(!$("dlg").open)$("dlg").showModal()}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-a],button,#top");if(!b)return;const D=b.dataset,id=b.id;
+ if(id==="top")return ask("Edit chart header",[["t","Chart title",st.title],["n","Top position",st.ceo]],g=>{if(g("t"))st.title=g("t");if(g("n"))st.ceo=g("n")});
+ if(id==="a-dept")return ask("Add department",[["n","Department name"],["l","Lead"]],g=>{if(g("n"))st.depts.push({n:g("n"),l:g("l"),t:[]})});
+ if(id==="a-ros")return roster();
+ if(id==="a-imp")return $("file").click();
+ if(id==="a-exp"){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(toData(st),null,2)],{type:"application/json"}));a.download="org_data.json";a.click();return}
+ if(id==="a-print"){try{window.print()}catch(x){}return}
+ if(id==="a-reset"){if(confirm("Replace the current chart with the sample data?")){st=fromData(SAMPLE);render()}return}
+ if(id==="t-int"){st.hideI=!st.hideI;return render()}if(id==="t-left"){st.hideL=!st.hideL;return render()}
+ const d=st.depts[D.i];
+ if(D.a==="ed")ask("Edit department",[["n","Department name",d.n],["l","Lead",d.l]],g=>{if(g("n")){d.n=g("n");d.l=g("l")}},()=>st.depts.splice(D.i,1));
+ else if(D.a==="at")ask("Add team",[["n","Team name"]],g=>{if(g("n"))d.t.push({n:g("n"),m:[]})});
+ else if(D.a==="et"){const t=d.t[D.j];ask("Edit team",[["n","Team name",t.n]],g=>{if(g("n"))t.n=g("n")},()=>d.t.splice(D.j,1))}
+ else if(D.a==="rm"){d.t[D.j].m=d.t[D.j].m.filter(x=>x!==D.p);render()}});
+document.addEventListener("change",e=>{const D=e.target.dataset;if(D.a==="add"&&e.target.value){st.depts[D.i].t[D.j].m.push(e.target.value);render()}});
+$("file").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.departments))throw 0;st=fromData(d);render()}catch(x){alert("Could not read that file. Use a JSON file made by build_data.py or the Export button.")}};r.readAsText(f);e.target.value=""};
+$("q").oninput=e=>{q=e.target.value.trim().toLowerCase();render()};
+render();
+</script></body></html>
